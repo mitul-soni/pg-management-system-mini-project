@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PG Management System</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <i class="fa-solid fa-building"></i>
+      <span>PG Manager</span>
+    </div>
+    <button class="close-btn" id="closeSidebar"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav class="nav-menu">
+    <a href="#" class="nav-item active" data-page="dashboard">
+      <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+    </a>
+    <a href="#" class="nav-item" data-page="rooms">
+      <i class="fa-solid fa-door-open"></i><span>Rooms</span>
+    </a>
+    <a href="#" class="nav-item" data-page="students">
+      <i class="fa-solid fa-user-graduate"></i><span>Students</span>
+    </a>
+    <a href="#" class="nav-item" data-page="payments">
+      <i class="fa-solid fa-indian-rupee-sign"></i><span>Payments</span>
+    </a>
+    <a href="#" class="nav-item" data-page="complaints">
+      <i class="fa-solid fa-triangle-exclamation"></i><span>Complaints</span>
+    </a>
+    <a href="#" class="nav-item" data-page="notices">
+      <i class="fa-solid fa-bell"></i><span>Notices</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <span>v1.0.0 &copy; 2026</span>
+  </div>
+</aside>
+
+<!-- ===== TOPBAR ===== -->
+<div class="topbar">
+  <button class="menu-btn" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+  <h1 class="topbar-title" id="pageTitle">Dashboard</h1>
+  <div class="topbar-right">
+    <div class="avatar">Admin</div>
+  </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main-content" id="mainContent">
+
+  <!-- ========== DASHBOARD ========== -->
+  <section id="page-dashboard" class="page active">
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon"><i class="fa-solid fa-door-open"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Rooms</span>
+          <span class="stat-value" id="stat-total-rooms">0</span>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Occupied</span>
+          <span class="stat-value" id="stat-occupied">0</span>
+        </div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon"><i class="fa-solid fa-door-closed"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Vacant</span>
+          <span class="stat-value" id="stat-vacant">0</span>
+        </div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon"><i class="fa-solid fa-user-graduate"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Students</span>
+          <span class="stat-value" id="stat-students">0</span>
+        </div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Revenue (Month)</span>
+          <span class="stat-value" id="stat-revenue">₹0</span>
+        </div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Pending Dues</span>
+          <span class="stat-value" id="stat-pending">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-row">
+      <div class="card dash-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-list-check"></i> Recent Payments</h3>
+        </div>
+        <table class="data-table" id="dash-payments-table">
+          <thead><tr><th>Student</th><th>Room</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody id="dash-payments-body"></tbody>
+        </table>
+      </div>
+      <div class="card dash-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-bell"></i> Active Notices</h3>
+        </div>
+        <div id="dash-notices-list" class="notices-preview"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ROOMS ========== -->
+  <section id="page-rooms" class="page">
+    <div class="page-header">
+      <h2>Room Management</h2>
+      <button class="btn btn-primary" onclick="openModal('roomModal')">
+        <i class="fa-solid fa-plus"></i> Add Room
+      </button>
+    </div>
+
+    <div class="filter-bar">
+      <select id="roomTypeFilter" onchange="renderRooms()">
+        <option value="">All Types</option>
+        <option value="Single">Single</option>
+        <option value="Double">Double</option>
+        <option value="Triple">Triple</option>
+      </select>
+      <select id="roomStatusFilter" onchange="renderRooms()">
+        <option value="">All Status</option>
+        <option value="Available">Available</option>
+        <option value="Occupied">Occupied</option>
+        <option value="Maintenance">Maintenance</option>
+      </select>
+    </div>
+
+    <div class="rooms-grid" id="rooms-grid"></div>
+  </section>
+
+  <!-- ========== STUDENTS ========== -->
+  <section id="page-students" class="page">
+    <div class="page-header">
+      <h2>Student Management</h2>
+      <button class="btn btn-primary" onclick="openModal('studentModal')">
+        <i class="fa-solid fa-plus"></i> Add Student
+      </button>
+    </div>
+    <div class="filter-bar">
+      <input type="text" id="studentSearch" placeholder="Search by name or ID..." oninput="renderStudents()" />
+      <select id="studentRoomFilter" onchange="renderStudents()">
+        <option value="">All Rooms</option>
+      </select>
+    </div>
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#ID</th><th>Name</th><th>Course</th><th>Room</th><th>Phone</th><th>Join Date</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="students-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========== PAYMENTS ========== -->
+  <section id="page-payments" class="page">
+    <div class="page-header">
+      <h2>Payment Management</h2>
+      <button class="btn btn-primary" onclick="openModal('paymentModal')">
+        <i class="fa-solid fa-plus"></i> Record Payment
+      </button>
+    </div>
+    <div class="filter-bar">
+      <select id="paymentStatusFilter" onchange="renderPayments()">
+        <option value="">All Status</option>
+        <option value="Paid">Paid</option>
+        <option value="Pending">Pending</option>
+        <option value="Overdue">Overdue</option>
+      </select>
+      <input type="month" id="paymentMonthFilter" onchange="renderPayments()" />
+    </div>
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Student</th><th>Room</th><th>Month</th><th>Amount</th><th>Paid On</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="payments-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========== COMPLAINTS ========== -->
+  <section id="page-complaints" class="page">
+    <div class="page-header">
+      <h2>Complaints & Maintenance</h2>
+      <button class="btn btn-primary" onclick="openModal('complaintModal')">
+        <i class="fa-solid fa-plus"></i> New Complaint
+      </button>
+    </div>
+    <div class="filter-bar">
+      <select id="complaintStatusFilter" onchange="renderComplaints()">
+        <option value="">All Status</option>
+        <option value="Open">Open</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Resolved">Resolved</option>
+      </select>
+    </div>
+    <div class="complaints-list" id="complaints-list"></div>
+  </section>
+
+  <!-- ========== NOTICES ========== -->
+  <section id="page-notices" class="page">
+    <div class="page-header">
+      <h2>Notice Board</h2>
+      <button class="btn btn-primary" onclick="openModal('noticeModal')">
+        <i class="fa-solid fa-plus"></i> Post Notice
+      </button>
+    </div>
+    <div class="notices-grid" id="notices-grid"></div>
+  </section>
+
+</main>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Room Modal -->
+<div class="modal-overlay" id="roomModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="roomModalTitle">Add Room</h3>
+      <button class="close-modal" onclick="closeModal('roomModal')">&times;</button>
+    </div>
+    <form id="roomForm" onsubmit="submitRoom(event)">
+      <input type="hidden" id="roomId" />
+      <div class="form-group">
+        <label>Room Number *</label>
+        <input type="text" id="roomNumber" placeholder="e.g. 101" required />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Type *</label>
+          <select id="roomType" required>
+            <option value="">Select</option>
+            <option value="Single">Single</option>
+            <option value="Double">Double</option>
+            <option value="Triple">Triple</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Floor</label>
+          <input type="number" id="roomFloor" placeholder="e.g. 1" min="0" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monthly Rent (₹) *</label>
+          <input type="number" id="roomRent" placeholder="e.g. 5000" required />
+        </div>
+        <div class="form-group">
+          <label>Status *</label>
+          <select id="roomStatus" required>
+            <option value="Available">Available</option>
+            <option value="Occupied">Occupied</option>
+            <option value="Maintenance">Maintenance</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Amenities</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" value="AC" class="amenity" /> AC</label>
+          <label><input type="checkbox" value="WiFi" class="amenity" /> WiFi</label>
+          <label><input type="checkbox" value="Attached Bathroom" class="amenity" /> Attached Bathroom</label>
+          <label><input type="checkbox" value="Balcony" class="amenity" /> Balcony</label>
+          <label><input type="checkbox" value="Geyser" class="amenity" /> Geyser</label>
+          <label><input type="checkbox" value="TV" class="amenity" /> TV</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('roomModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Room</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Student Modal -->
+<div class="modal-overlay" id="studentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="studentModalTitle">Add Student</h3>
+      <button class="close-modal" onclick="closeModal('studentModal')">&times;</button>
+    </div>
+    <form id="studentForm" onsubmit="submitStudent(event)">
+      <input type="hidden" id="studentId" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="studentName" placeholder="e.g. Ravi Kumar" required />
+        </div>
+        <div class="form-group">
+          <label>Student ID *</label>
+          <input type="text" id="studentSID" placeholder="e.g. STU2024001" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Course *</label>
+          <input type="text" id="studentCourse" placeholder="e.g. B.Tech CSE" required />
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <select id="studentYear">
+            <option value="1st">1st Year</option>
+            <option value="2nd">2nd Year</option>
+            <option value="3rd">3rd Year</option>
+            <option value="4th">4th Year</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone *</label>
+          <input type="tel" id="studentPhone" placeholder="10-digit number" maxlength="10" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="studentEmail" placeholder="student@email.com" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Room Number *</label>
+          <select id="studentRoom" required></select>
+        </div>
+        <div class="form-group">
+          <label>Join Date *</label>
+          <input type="date" id="studentJoinDate" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Guardian Name</label>
+        <input type="text" id="studentGuardian" placeholder="Guardian's full name" />
+      </div>
+      <div class="form-group">
+        <label>Guardian Phone</label>
+        <input type="tel" id="studentGuardianPhone" placeholder="Guardian contact number" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('studentModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Record Payment</h3>
+      <button class="close-modal" onclick="closeModal('paymentModal')">&times;</button>
+    </div>
+    <form id="paymentForm" onsubmit="submitPayment(event)">
+      <input type="hidden" id="paymentId" />
+      <div class="form-group">
+        <label>Student *</label>
+        <select id="paymentStudent" required onchange="autoFillRent()"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Month *</label>
+          <input type="month" id="paymentMonth" required />
+        </div>
+        <div class="form-group">
+          <label>Amount (₹) *</label>
+          <input type="number" id="paymentAmount" placeholder="e.g. 5000" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Payment Date</label>
+          <input type="date" id="paymentDate" />
+        </div>
+        <div class="form-group">
+          <label>Mode</label>
+          <select id="paymentMode">
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Cheque">Cheque</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Status *</label>
+        <select id="paymentStatus" required>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Remarks</label>
+        <input type="text" id="paymentRemarks" placeholder="Optional notes" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('paymentModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Payment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Complaint Modal -->
+<div class="modal-overlay" id="complaintModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>New Complaint</h3>
+      <button class="close-modal" onclick="closeModal('complaintModal')">&times;</button>
+    </div>
+    <form id="complaintForm" onsubmit="submitComplaint(event)">
+      <input type="hidden" id="complaintId" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Student *</label>
+          <select id="complaintStudent" required></select>
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="complaintCategory" required>
+            <option value="">Select</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Housekeeping">Housekeeping</option>
+            <option value="Internet">Internet</option>
+            <option value="Noise">Noise</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea id="complaintDesc" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="complaintPriority">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="complaintStatus">
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('complaintModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Notice Modal -->
+<div class="modal-overlay" id="noticeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Post Notice</h3>
+      <button class="close-modal" onclick="closeModal('noticeModal')">&times;</button>
+    </div>
+    <form id="noticeForm" onsubmit="submitNotice(event)">
+      <input type="hidden" id="noticeId" />
+      <div class="form-group">
+        <label>Title *</label>
+        <input type="text" id="noticeTitle" placeholder="Notice title" required />
+      </div>
+      <div class="form-group">
+        <label>Content *</label>
+        <textarea id="noticeContent" rows="5" placeholder="Notice content..." required></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select id="noticeCategory">
+            <option value="General">General</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Rules">Rules</option>
+            <option value="Event">Event</option>
+            <option value="Emergency">Emergency</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" id="noticeExpiry" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('noticeModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Post Notice</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Confirm Delete</h3>
+      <button class="close-modal" onclick="closeModal('confirmModal')">&times;</button>
+    </div>
+    <div style="padding:1.2rem;">
+      <p id="confirmMessage">Are you sure you want to delete this record?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Cancel</button>
+      <button class="btn btn-danger" id="confirmBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
